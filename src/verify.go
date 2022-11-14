@@ -48,22 +48,16 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int) {
 	}
 	tr.Proxy = http.ProxyURL(proxyUrl)
 	client := http.Client{Timeout: 20 * time.Second, Transport: &tr}
-	var host string
-	if pi.Type == "HTTPS" {
-		host = "https://api.vore.top/api/IPv4"
-	} else {
-		host = "http://api.vore.top/api/IPv4"
-	}
+	host := "http://api.vore.top/api/IPv4"
 	request, _ := http.NewRequest("GET", host, nil)
 	//处理返回结果
 	res, err := client.Do(request)
-	pi.RequestNum++
+	pi.RequestNum += 1
 	if err != nil {
 		return
 	}
 	dataBytes, _ := io.ReadAll(res.Body)
 	result := string(dataBytes)
-
 	if !strings.Contains(result, "info1") {
 		return
 	}
@@ -95,7 +89,6 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int) {
 		}
 		PIAdd(pi)
 	}
-	//fmt.Println("有效代理：" + pi.Ip)
 }
 
 func PIAdd(pi *ProxyIp) {

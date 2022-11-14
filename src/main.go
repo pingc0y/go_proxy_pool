@@ -68,8 +68,8 @@ func InitData() {
 		ticker2 := time.NewTicker(verifyTime * time.Second)
 		for range ticker2.C {
 			for i, _ := range ProxyPool {
-				ProxyPool[i].RequestNum = 0
-				ProxyPool[i].SuccessNum = 0
+				ProxyPool[i].RequestNum = 1
+				ProxyPool[i].SuccessNum = 1
 			}
 			for io := 0; io < 4; io++ {
 				for i := range ProxyPool {
@@ -81,7 +81,7 @@ func InitData() {
 			wg3.Wait()
 			lock.Lock()
 			for i, v := range ProxyPool {
-				if v.SuccessNum == 0 {
+				if v.SuccessNum == 1 {
 					if i+1 < len(ProxyPool) {
 						ProxyPool = append(ProxyPool[:i], ProxyPool[i+1:]...)
 					} else {

@@ -2,8 +2,7 @@ package main
 
 import (
 	"crypto/tls"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"gopkg.in/yaml.v2"
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -146,9 +145,8 @@ func spiderPlugin(spp *SpiderPlugin) {
 			log.Printf("%s 失败\n", spp.Name)
 		}
 	} else {
-		bytes, err := simplifiedchinese.GB18030.NewDecoder().Bytes(buf)
 		var pis []ProxyIp
-		err = yaml.Unmarshal(bytes, &pis)
+		err = json.Unmarshal(buf, &pis)
 		if err != nil {
 			log.Printf("%s 返回值不符合规范\n", spp.Name)
 			return
@@ -160,6 +158,5 @@ func spiderPlugin(spp *SpiderPlugin) {
 			go Verify(&pis[i], &wg, ch2)
 		}
 		wg.Wait()
-
 	}
 }

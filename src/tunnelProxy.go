@@ -171,7 +171,10 @@ func getSIp() string {
 			}
 		}
 	}
-	addr := httpS[0].Ip + ":" + httpS[0].Port
+	var addr string
+	if len(httpS) != 0 {
+		addr = httpS[0].Ip + ":" + httpS[0].Port
+	}
 	httpS = make([]ProxyIp, 0)
 	return addr
 }
