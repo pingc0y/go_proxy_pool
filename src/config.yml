@@ -16,167 +16,169 @@ config:
   #可用IP数量小于‘proxyNum’时就去抓取
   proxyNum: 10
   #代理IP验证间隔秒
-  verifyTime: 600
+  verifyTime: 1800
+  #抓取/检测状态线程数
+  threadNum: 50
 
-##ip源
-#spider:
-#  #代理获取源1
-#  - name: '齐云代理'
-#    method: 'GET'
-#    #使用的请求头
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    #获取的地址
-#    urls: 'https://proxy.ip3366.net/free/?action=china&page=1,https://proxy.ip3366.net/free/?action=china&page=2,https://proxy.ip3366.net/free/?action=china&page=3'
-#    #获取IP的正则表达式，
-#    ip: '\"IP\">(\d+?\.\d+?.\d+?\.\d+?)</td>'
-#    #获取端口的正则表达式
-#    port: '\"PORT\">(\d+?)</td>'
-#    #获取代理模式（匿名，透明）的正则表达式
-#    anonymity: "\"匿名度\">(.+?)</td>"
-#    #是否使用代理去请求
-#    proxy: false
-#    #代理模式文本替换，用于统一格式
-#    replace:
-#      匿名: '普匿'
-#
-#    #代理获取源2
-#  - name: "89代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://www.89ip.cn/index_1.html,https://www.89ip.cn/index_2.html,https://www.89ip.cn/index_3.html"
-#    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
-#    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-#    anonymity: '透明'
-#    proxy: false
-#
-#  #代理获取源3，每天需要跟换地址
-#  - name: "开心代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "http://www.kxdaili.com/daili/ip/7713.html"
-#    ip: '\[.+?\](\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#'
-#    port: '\[.+?\]\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#'
-#    anonymity: '\[(.+?)\]\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#'
-#    proxy: false
-#
-#  #代理获取源4，有风控
-#  - name: "站大爷代理"
-#    method: 'GET'
-#    Headers:
-#      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
-#    urls: "https://www.zdaye.com/dayProxy/ip/334067.html"
-#    ip: '<td>(\d+?\.\d+?.\d+?\.\d+)'
-#    port: '<td>(\d+)&'
-#    anonymity: '<td>HTTP.{0,1}</td>[\s]*?<td>(.+)</td>'
-#    proxy: false
-#
-#    #代理获取源5
-#  - name: "快代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "http://www.ip3366.net/?stype=1&page=1,http://www.ip3366.net/?stype=1&page=2,http://www.ip3366.net/?stype=3&page=1,http://www.ip3366.net/?stype=3&page=2"
-#    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
-#    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-#    anonymity: '高匿'
-#    proxy: false
-#
-#    #代理获取源6
-#  - name: "高可用代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://ip.jiangxianli.com/?page=1"
-#    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
-#    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-#    anonymity: '<td>\d+?</td><td>(.+?)</td>'
-#    proxy: false
-#
-#
-#    #代理获取源7
-#  - name: "小舒代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://xsdaili.cn/dayProxy/ip/1780.html"
-#    ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#\[.+?\]'
-#    port: '\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#\[.+?\]'
-#    anonymity: '\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#\[(.+?)\]'
-#    proxy: false
-#    replace:
-#      匿名: '普匿'
-#
-#  #代理获取源8
-#  - name: "命运零代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "http://proxylist.fatezero.org/proxy.list"
-#    ip: '\"host\": \"(.+?)\"'
-#    port: '\"port\": (\d+)'
-#    anonymity: '\"anonymity": \"(.+?)\"'
-#    proxy: false
-#    #对抓取的文本替换
-#    replace:
-#      transparent: '透明'
-#      anonymous: '普匿'
-#      high_普匿: '高匿'
-#
-#
-#  #代理获取源9,有风控
-#  - name: '自由代理'
-#    method: 'GET'
-#    Headers:
-#      #需要使用cookie,不然会有验证
-#      User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
-#    urls: "https://www.freeproxylists.net/zh/?c=CN&u=50&page=1"
-#    ip: '%3e(.{0,60}?)%3c%2f'
-#    port: 'center\">(\d+?)</td><td'
-#    anonymity: 'center\">(.{0,5})</td><td><img'
-#    proxy: true
-#
-#  #代理获取源10，高可用
-#  - name: "db代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://proxydb.net/?protocol=http&protocol=https&country=CN"
-#    ip: 'href=\"/(\d+?\.\d+?.\d+?\.\d+?)/\d+?#http.{0,1}\">'
-#    port: 'href=\"/\d+?\.\d+?.\d+?\.\d+?/(\d+?)#http.{0,1}\">'
-#    anonymity: '高匿'
-#    proxy: false
-#
-#
-#  #代理获取源11
-#  - name: "hidemy代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://hidemy.name/cn/proxy-list/?country=CN#list"
-#    ip: '<td>(\d+?\.\d+?.\d+?\.\d+?)</td><td>\d+</td>'
-#    port: '<td>\d+?\.\d+?.\d+?\.\d+?</td><td>(\d+)</td>'
-#    anonymity: '<td>HTTP.{0,1}</td><td>(.+?)</td>'
-#    proxy: true
-#    #对抓取的文本替换
-#    replace:
-#      否: '透明'
-#      中: '普匿'
-#      低: '普匿'
-#      高: '高匿'
-#
-#  #代理获取源12
-#  - name: "scrape代理"
-#    method: 'GET'
-#    Headers:
-#      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-#    urls: "https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000&country=CN&ssl=all&anonymity=all"
-#    ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+'
-#    port: '\d+?\.\d+?.\d+?\.\d+?:(\d+)'
-#    anonymity: '透明'
-#    proxy: true
+#ip源
+spider:
+  #代理获取源1
+  - name: '齐云代理'
+    method: 'GET'
+    #使用的请求头
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    #获取的地址
+    urls: 'https://proxy.ip3366.net/free/?action=china&page=1,https://proxy.ip3366.net/free/?action=china&page=2,https://proxy.ip3366.net/free/?action=china&page=3'
+    #获取IP的正则表达式，
+    ip: '\"IP\">(\d+?\.\d+?.\d+?\.\d+?)</td>'
+    #获取端口的正则表达式
+    port: '\"PORT\">(\d+?)</td>'
+    #获取代理模式（匿名，透明）的正则表达式
+    anonymity: "\"匿名度\">(.+?)</td>"
+    #是否使用代理去请求
+    proxy: false
+    #代理模式文本替换，用于统一格式
+    replace:
+      匿名: '普匿'
+
+    #代理获取源2
+  - name: "89代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://www.89ip.cn/index_1.html,https://www.89ip.cn/index_2.html,https://www.89ip.cn/index_3.html"
+    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
+    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
+    anonymity: '透明'
+    proxy: false
+
+  #代理获取源3，每天需要跟换地址
+  - name: "开心代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "http://www.kxdaili.com/daili/ip/7713.html"
+    ip: '\[.+?\](\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#'
+    port: '\[.+?\]\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#'
+    anonymity: '\[(.+?)\]\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#'
+    proxy: false
+
+  #代理获取源4，有风控
+  - name: "站大爷代理"
+    method: 'GET'
+    Headers:
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    urls: "https://www.zdaye.com/dayProxy/ip/334067.html"
+    ip: '<td>(\d+?\.\d+?.\d+?\.\d+)'
+    port: '<td>(\d+)&'
+    anonymity: '<td>HTTP.{0,1}</td>[\s]*?<td>(.+)</td>'
+    proxy: false
+
+    #代理获取源5
+  - name: "快代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "http://www.ip3366.net/?stype=1&page=1,http://www.ip3366.net/?stype=1&page=2,http://www.ip3366.net/?stype=3&page=1,http://www.ip3366.net/?stype=3&page=2"
+    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
+    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
+    anonymity: '高匿'
+    proxy: false
+
+    #代理获取源6
+  - name: "高可用代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://ip.jiangxianli.com/?page=1"
+    ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
+    port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
+    anonymity: '<td>\d+?</td><td>(.+?)</td>'
+    proxy: false
+
+
+    #代理获取源7
+  - name: "小舒代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://xsdaili.cn/dayProxy/ip/1780.html"
+    ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#\[.+?\]'
+    port: '\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#\[.+?\]'
+    anonymity: '\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#\[(.+?)\]'
+    proxy: false
+    replace:
+      匿名: '普匿'
+
+  #代理获取源8
+  - name: "命运零代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "http://proxylist.fatezero.org/proxy.list"
+    ip: '\"host\": \"(.+?)\"'
+    port: '\"port\": (\d+)'
+    anonymity: '\"anonymity": \"(.+?)\"'
+    proxy: false
+    #对抓取的文本替换
+    replace:
+      transparent: '透明'
+      anonymous: '普匿'
+      high_普匿: '高匿'
+
+
+  #代理获取源9,有风控
+  - name: '自由代理'
+    method: 'GET'
+    Headers:
+      #需要使用cookie,不然会有验证
+      User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+    urls: "https://www.freeproxylists.net/zh/?c=CN&u=50&page=1"
+    ip: '%3e(.{0,60}?)%3c%2f'
+    port: 'center\">(\d+?)</td><td'
+    anonymity: 'center\">(.{0,5})</td><td><img'
+    proxy: true
+
+  #代理获取源10，高可用
+  - name: "db代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://proxydb.net/?protocol=http&protocol=https&country=CN"
+    ip: 'href=\"/(\d+?\.\d+?.\d+?\.\d+?)/\d+?#http.{0,1}\">'
+    port: 'href=\"/\d+?\.\d+?.\d+?\.\d+?/(\d+?)#http.{0,1}\">'
+    anonymity: '高匿'
+    proxy: false
+
+
+  #代理获取源11
+  - name: "hidemy代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://hidemy.name/cn/proxy-list/?country=CN#list"
+    ip: '<td>(\d+?\.\d+?.\d+?\.\d+?)</td><td>\d+</td>'
+    port: '<td>\d+?\.\d+?.\d+?\.\d+?</td><td>(\d+)</td>'
+    anonymity: '<td>HTTP.{0,1}</td><td>(.+?)</td>'
+    proxy: true
+    #对抓取的文本替换
+    replace:
+      否: '透明'
+      中: '普匿'
+      低: '普匿'
+      高: '高匿'
+
+  #代理获取源12
+  - name: "scrape代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    urls: "https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000&country=CN&ssl=all&anonymity=all"
+    ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+'
+    port: '\d+?\.\d+?.\d+?\.\d+?:(\d+)'
+    anonymity: '透明'
+    proxy: true
 
 
 #通过插件，扩展ip源

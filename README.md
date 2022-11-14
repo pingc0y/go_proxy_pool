@@ -137,7 +137,9 @@ config:
   #可用IP数量小于‘proxyNum’时就去抓取
   proxyNum: 10
   #代理IP验证间隔秒
-  verifyTime: 600
+  verifyTime: 1800
+  #抓取/检测状态线程数
+  threadNum: 50
 
 #ip源
 spider:

@@ -18,6 +18,7 @@ import (
 
 var wg sync.WaitGroup
 var wg2 sync.WaitGroup
+var mux sync.Mutex
 var ch2 = make(chan int, 50)
 
 var run = false
@@ -33,6 +34,7 @@ func spiderRun() {
 		go spider(&conf.Spider[i])
 	}
 	wg2.Wait()
+
 	log.Println("抓取結束")
 	log.Println("开始扩展抓取代理...")
 	for i := range conf.SpiderPlugin {
@@ -115,7 +117,7 @@ func spider(sp *Spider) {
 	for i := range pis {
 		wg.Add(1)
 		ch2 <- 1
-		go Verify(&pis[i], &wg, ch2)
+		go Verify(&pis[i], &wg, ch2, true)
 	}
 	wg.Wait()
 
@@ -155,7 +157,7 @@ func spiderPlugin(spp *SpiderPlugin) {
 		for i := range pis {
 			wg.Add(1)
 			ch2 <- 1
-			go Verify(&pis[i], &wg, ch2)
+			go Verify(&pis[i], &wg, ch2, true)
 		}
 		wg.Wait()
 	}

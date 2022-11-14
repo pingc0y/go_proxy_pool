@@ -32,7 +32,7 @@ type ProxyIp struct {
 var ProxyPool []ProxyIp
 var lock sync.Mutex
 
-func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int) {
+func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int, first bool) {
 	defer func() {
 		wg.Done()
 		<-ch
@@ -52,7 +52,9 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int) {
 	request, _ := http.NewRequest("GET", host, nil)
 	//处理返回结果
 	res, err := client.Do(request)
-	pi.RequestNum += 1
+	if !first {
+		pi.RequestNum++
+	}
 	if err != nil {
 		return
 	}
@@ -80,8 +82,12 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int) {
 	tc := time.Since(startT)
 	pi.Time = time.Now().Unix()
 	pi.Speed = int64(tc)
-	pi.SuccessNum++
-	if pi.RequestNum == 1 {
+	if !first {
+		pi.SuccessNum++
+	}
+	if first {
+		pi.RequestNum = 1
+		pi.SuccessNum = 1
 		if HTTPSVerify(pi.Ip + ":" + pi.Port) {
 			pi.Type = "HTTPS"
 		} else {

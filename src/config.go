@@ -24,6 +24,7 @@ type config struct {
 	TunnelTime int    `yaml:"tunnelTime" json:"tunnelTime"`
 	ProxyNum   int    `yaml:"proxyNum" json:"proxyNum"`
 	VerifyTime int    `yaml:"verifyTime" json:"verifyTime"`
+	ThreadNum  int    `yaml:"threadNum" json:"threadNum"`
 }
 type Spider struct {
 	Name      string            `yaml:"name" json:"name"`
@@ -89,6 +90,13 @@ func GetConfigData() {
 	}
 	defer file.Close()
 	all, err := io.ReadAll(file)
+	if err != nil {
+		log.Println("代理json解析错误：" + err.Error())
+		return
+	}
+	if len(all) == 0 {
+		return
+	}
 	err = json.Unmarshal(all, &ProxyPool)
 	if err != nil {
 		log.Println("代理json解析错误：" + err.Error())

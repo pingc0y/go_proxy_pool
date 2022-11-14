@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
+	"log"
 	"os"
 	"sync"
 	"time"
 )
 
 var wg3 sync.WaitGroup
+
 var ch1 = make(chan int, 50)
 
 func main() {
@@ -24,6 +27,9 @@ func main() {
 func InitData() {
 	//获取配置文件
 	GetConfigData()
+	//设置线程数量
+	ch1 = make(chan int, conf.Config.ThreadNum)
+	ch2 = make(chan int, conf.Config.ThreadNum)
 	//是否需要抓代理
 	if len(ProxyPool) < conf.Config.ProxyNum {
 		//抓取代理
@@ -39,12 +45,12 @@ func InitData() {
 		for range ticker.C {
 			if len(ProxyPool) < conf.Config.ProxyNum {
 				if !run {
+					log.Printf("代理数量不足 %d\n", conf.Config.ProxyNum)
 					//抓取代理
 					spiderRun()
 					//导出代理到文件
 					export()
 				}
-
 			}
 		}
 	}()
@@ -65,50 +71,65 @@ func InitData() {
 	// 验证代理存活情况
 	go func() {
 		verifyTime := time.Duration(conf.Config.VerifyTime)
-		ticker2 := time.NewTicker(verifyTime * time.Second)
-		for range ticker2.C {
+		ticker := time.NewTicker(verifyTime * time.Second)
+		for range ticker.C {
+			log.Println("开始验证代理存活情况")
 			for i, _ := range ProxyPool {
-				ProxyPool[i].RequestNum = 1
-				ProxyPool[i].SuccessNum = 1
+				ProxyPool[i].RequestNum = 0
+				ProxyPool[i].SuccessNum = 0
 			}
 			for io := 0; io < 4; io++ {
 				for i := range ProxyPool {
 					wg3.Add(1)
 					ch1 <- 1
-					Verify(&ProxyPool[i], &wg3, ch1)
+					go Verify(&ProxyPool[i], &wg3, ch1, false)
 				}
 			}
 			wg3.Wait()
 			lock.Lock()
-			for i, v := range ProxyPool {
-				if v.SuccessNum == 1 {
-					if i+1 < len(ProxyPool) {
-						ProxyPool = append(ProxyPool[:i], ProxyPool[i+1:]...)
-					} else {
-						ProxyPool = ProxyPool[:i]
-					}
+			var pp []ProxyIp
+			for i := range ProxyPool {
+				if ProxyPool[i].SuccessNum != 0 {
+					pp = append(pp, ProxyPool[i])
 				}
 			}
+			ProxyPool = pp
 			export()
 			lock.Unlock()
-
+			log.Printf("验证结束,可用IP数: %d\n", len(ProxyPool))
 		}
+
 	}()
 }
 
 func export() {
 	//导出代理到文件
+	err := os.Truncate("data.json", 0)
+	if len(ProxyPool) == 0 {
+		return
+	}
+	if err != nil {
+		log.Printf("data.json清理失败：%s", err)
+		return
+	}
 	file, err := os.OpenFile("data.json", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
-		err.Error()
+		log.Printf("data.json打开失败：%s", err)
 		return
 	}
+	defer file.Close()
+
 	data, err := json.Marshal(ProxyPool)
 	if err != nil {
-		file.Close()
-		err.Error()
+		log.Printf("代理json化失败：%s", err)
 		return
 	}
-	file.Write(data)
-	file.Close()
+	buf := bufio.NewWriter(file)
+	// 字节写入
+	buf.Write(data)
+	// 将缓冲中的数据写入
+	err = buf.Flush()
+	if err != nil {
+		log.Println("代理json保存失败:", err)
+	}
 }
