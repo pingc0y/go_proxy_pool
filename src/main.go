@@ -48,7 +48,7 @@ func InitData() {
 		ticker := time.NewTicker(60 * time.Second)
 		for range ticker.C {
 			if len(ProxyPool) < conf.Config.ProxyNum {
-				if !run {
+				if !run && !verifyIS {
 					log.Printf("代理数量不足 %d\n", conf.Config.ProxyNum)
 					//抓取代理
 					spiderRun()
@@ -78,7 +78,7 @@ func InitData() {
 		verifyTime := time.Duration(conf.Config.VerifyTime)
 		ticker := time.NewTicker(verifyTime * time.Second)
 		for range ticker.C {
-			if !verifyIS {
+			if !verifyIS && !run {
 				VerifyProxy()
 			}
 		}

@@ -120,6 +120,8 @@ func delete(c *gin.Context) {
 func verify(c *gin.Context) {
 	if verifyIS {
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"验证中\"}"))
+	} else if run {
+		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"代理抓取中，请稍后再来验证\"}"))
 	} else {
 		go VerifyProxy()
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"开始验证代理\"}"))
@@ -129,6 +131,8 @@ func verify(c *gin.Context) {
 func spiderUp(c *gin.Context) {
 	if run {
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"抓取中\"}"))
+	} else if verifyIS {
+		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"代理验证中，请稍后再来抓取\"}"))
 	} else {
 		go spiderRun()
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"开始抓取代理IP\"}"))
