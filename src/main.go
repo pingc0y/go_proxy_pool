@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -10,17 +11,23 @@ import (
 )
 
 var wg3 sync.WaitGroup
-
+var mux1 sync.Mutex
 var ch1 = make(chan int, 50)
 
 func main() {
+	//VerifyHttp("127.0.0.1:10809")
 
+	fmt.Println("           ___                     ___            _ " +
+		"\n ___  ___ | . " + "\\ _ _  ___ __   _ _ | . \\ ___  ___ | |" +
+		"\n/ . |/ . \\|  _/| '_>/ . \\\\ \\/| | ||  _// . \\/ . \\| |" +
+		"\n\\_. |\\___/|_|  |_|  \\___//\\_\\`_. ||_|  \\___/\\___/|_|" +
+		"\n<___'                        <___'                  ")
 	InitData()
 	//开启隧道代理
-	go RunTunnelProxyServer()
+	go httpSRunTunnelProxyServer()
+	go socket5RunTunnelProxyServer()
 	//启动webAPi
 	Run()
-
 }
 
 // 初始化
@@ -34,10 +41,7 @@ func InitData() {
 	if len(ProxyPool) < conf.Config.ProxyNum {
 		//抓取代理
 		spiderRun()
-		//导出代理到文件
-		export()
 	}
-
 	//定时判断是否需要获取代理iP
 	go func() {
 		// 每 60 秒钟时执行一次
@@ -48,9 +52,10 @@ func InitData() {
 					log.Printf("代理数量不足 %d\n", conf.Config.ProxyNum)
 					//抓取代理
 					spiderRun()
-					//导出代理到文件
-					export()
 				}
+			} else {
+				//保存代理到本地
+				export()
 			}
 		}
 	}()
@@ -60,11 +65,11 @@ func InitData() {
 		tunnelTime := time.Duration(conf.Config.TunnelTime)
 		ticker := time.NewTicker(tunnelTime * time.Second)
 		for range ticker.C {
-			if len(ProxyPool) == 0 {
-				continue
+			if len(ProxyPool) != 0 {
+				httpsIp = getHttpsIp()
+				httpIp = gethttpIp()
+				socket5Ip = getSocket5Ip()
 			}
-			Iip = getIIp()
-			Sip = getSIp()
 		}
 	}()
 
@@ -73,36 +78,16 @@ func InitData() {
 		verifyTime := time.Duration(conf.Config.VerifyTime)
 		ticker := time.NewTicker(verifyTime * time.Second)
 		for range ticker.C {
-			log.Println("开始验证代理存活情况")
-			for i, _ := range ProxyPool {
-				ProxyPool[i].RequestNum = 0
-				ProxyPool[i].SuccessNum = 0
+			if !verifyIS {
+				VerifyProxy()
 			}
-			for io := 0; io < 4; io++ {
-				for i := range ProxyPool {
-					wg3.Add(1)
-					ch1 <- 1
-					go Verify(&ProxyPool[i], &wg3, ch1, false)
-				}
-			}
-			wg3.Wait()
-			lock.Lock()
-			var pp []ProxyIp
-			for i := range ProxyPool {
-				if ProxyPool[i].SuccessNum != 0 {
-					pp = append(pp, ProxyPool[i])
-				}
-			}
-			ProxyPool = pp
-			export()
-			lock.Unlock()
-			log.Printf("验证结束,可用IP数: %d\n", len(ProxyPool))
 		}
-
 	}()
 }
 
 func export() {
+	mux1.Lock()
+	defer mux1.Unlock()
 	//导出代理到文件
 	err := os.Truncate("data.json", 0)
 	if len(ProxyPool) == 0 {

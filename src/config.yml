@@ -5,12 +5,14 @@ proxy:
 
 #配置信息
 config:
-  #web监听的IP
+  #监听IP
   ip: 0.0.0.0
-  #web监听端口
+  #webApi监听端口
   port: 8080
-  #隧道代理端口
-  tunnelPort: 8111
+  #http隧道代理端口
+  httpTunnelPort: 8111
+  #socket隧道代理端口
+  socketTunnelPort: 8112
   #隧道代理更换时间秒
   tunnelTime: 60
   #可用IP数量小于‘proxyNum’时就去抓取
@@ -18,13 +20,17 @@ config:
   #代理IP验证间隔秒
   verifyTime: 1800
   #抓取/检测状态线程数
-  threadNum: 50
+  threadNum: 200
 
 #ip源
 spider:
-  #代理获取源1
   - name: '齐云代理'
+    #请求方式
     method: 'GET'
+    #post传参用的请求体
+    #body: ''
+    #urls请求间隔/秒，防止频率过快被限制
+    interval: 0
     #使用的请求头
     Headers:
       User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
@@ -34,15 +40,9 @@ spider:
     ip: '\"IP\">(\d+?\.\d+?.\d+?\.\d+?)</td>'
     #获取端口的正则表达式
     port: '\"PORT\">(\d+?)</td>'
-    #获取代理模式（匿名，透明）的正则表达式
-    anonymity: "\"匿名度\">(.+?)</td>"
     #是否使用代理去请求
     proxy: false
-    #代理模式文本替换，用于统一格式
-    replace:
-      匿名: '普匿'
 
-    #代理获取源2
   - name: "89代理"
     method: 'GET'
     Headers:
@@ -50,10 +50,9 @@ spider:
     urls: "https://www.89ip.cn/index_1.html,https://www.89ip.cn/index_2.html,https://www.89ip.cn/index_3.html"
     ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
     port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-    anonymity: '透明'
     proxy: false
 
-  #代理获取源3，每天需要跟换地址
+  #每天需要跟换地址
   - name: "开心代理"
     method: 'GET'
     Headers:
@@ -61,21 +60,8 @@ spider:
     urls: "http://www.kxdaili.com/daili/ip/7713.html"
     ip: '\[.+?\](\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#'
     port: '\[.+?\]\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#'
-    anonymity: '\[(.+?)\]\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#'
     proxy: false
 
-  #代理获取源4，有风控
-  - name: "站大爷代理"
-    method: 'GET'
-    Headers:
-      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
-    urls: "https://www.zdaye.com/dayProxy/ip/334067.html"
-    ip: '<td>(\d+?\.\d+?.\d+?\.\d+)'
-    port: '<td>(\d+)&'
-    anonymity: '<td>HTTP.{0,1}</td>[\s]*?<td>(.+)</td>'
-    proxy: false
-
-    #代理获取源5
   - name: "快代理"
     method: 'GET'
     Headers:
@@ -83,10 +69,8 @@ spider:
     urls: "http://www.ip3366.net/?stype=1&page=1,http://www.ip3366.net/?stype=1&page=2,http://www.ip3366.net/?stype=3&page=1,http://www.ip3366.net/?stype=3&page=2"
     ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
     port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-    anonymity: '高匿'
     proxy: false
 
-    #代理获取源6
   - name: "高可用代理"
     method: 'GET'
     Headers:
@@ -94,24 +78,18 @@ spider:
     urls: "https://ip.jiangxianli.com/?page=1"
     ip: '<td>[\s]*?(\d+?\.\d+?.\d+?\.\d+?)[\s]*?</td>'
     port: '<td>[\s]*?\d+?\.\d+?.\d+?\.\d+?[\s]*?</td>[\s]*?<td>[\s]*?(\d+?)[\s]*?</td>'
-    anonymity: '<td>\d+?</td><td>(.+?)</td>'
     proxy: false
 
 
-    #代理获取源7
   - name: "小舒代理"
     method: 'GET'
     Headers:
       User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-    urls: "https://xsdaili.cn/dayProxy/ip/1780.html"
+    urls: "https://xsdaili.cn/dayProxy/ip/1796.html"
     ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+?@.+?#\[.+?\]'
     port: '\d+?\.\d+?.\d+?\.\d+?:(\d+?)@.+?#\[.+?\]'
-    anonymity: '\d+?\.\d+?.\d+?\.\d+?:\d+?@.+?#\[(.+?)\]'
     proxy: false
-    replace:
-      匿名: '普匿'
 
-  #代理获取源8
   - name: "命运零代理"
     method: 'GET'
     Headers:
@@ -119,16 +97,9 @@ spider:
     urls: "http://proxylist.fatezero.org/proxy.list"
     ip: '\"host\": \"(.+?)\"'
     port: '\"port\": (\d+)'
-    anonymity: '\"anonymity": \"(.+?)\"'
     proxy: false
-    #对抓取的文本替换
-    replace:
-      transparent: '透明'
-      anonymous: '普匿'
-      high_普匿: '高匿'
 
 
-  #代理获取源9,有风控
   - name: '自由代理'
     method: 'GET'
     Headers:
@@ -137,39 +108,27 @@ spider:
     urls: "https://www.freeproxylists.net/zh/?c=CN&u=50&page=1"
     ip: '%3e(.{0,60}?)%3c%2f'
     port: 'center\">(\d+?)</td><td'
-    anonymity: 'center\">(.{0,5})</td><td><img'
     proxy: true
 
-  #代理获取源10，高可用
   - name: "db代理"
     method: 'GET'
     Headers:
       User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-    urls: "https://proxydb.net/?protocol=http&protocol=https&country=CN"
+    urls: "http://proxydb.net/?protocol=http&country=CN,http://proxydb.net/?protocol=https&country=CN,http://proxydb.net/?protocol=socks5&country=CN"
     ip: 'href=\"/(\d+?\.\d+?.\d+?\.\d+?)/\d+?#http.{0,1}\">'
     port: 'href=\"/\d+?\.\d+?.\d+?\.\d+?/(\d+?)#http.{0,1}\">'
-    anonymity: '高匿'
     proxy: false
 
 
-  #代理获取源11
   - name: "hidemy代理"
     method: 'GET'
     Headers:
       User-Agent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-    urls: "https://hidemy.name/cn/proxy-list/?country=CN#list"
+    urls: "https://hidemy.name/cn/proxy-list/?maxtime=1000&type=h#list,https://hidemy.name/cn/proxy-list/?maxtime=1000&type=h&start=64#list,https://hidemy.name/cn/proxy-list/?maxtime=1000&type=h&start=128#list,https://hidemy.name/cn/proxy-list/?maxtime=5000&type=5#list,https://hidemy.name/cn/proxy-list/?maxtime=5000&type=s#list"
     ip: '<td>(\d+?\.\d+?.\d+?\.\d+?)</td><td>\d+</td>'
     port: '<td>\d+?\.\d+?.\d+?\.\d+?</td><td>(\d+)</td>'
-    anonymity: '<td>HTTP.{0,1}</td><td>(.+?)</td>'
     proxy: true
-    #对抓取的文本替换
-    replace:
-      否: '透明'
-      中: '普匿'
-      低: '普匿'
-      高: '高匿'
 
-  #代理获取源12
   - name: "scrape代理"
     method: 'GET'
     Headers:
@@ -180,12 +139,38 @@ spider:
     anonymity: '透明'
     proxy: true
 
+  - name: "my代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+    urls: "https://www.my-proxy.com/free-socks-5-proxy.html,https://www.my-proxy.com/free-elite-proxy.html,https://www.my-proxy.com/free-anonymous-proxy.html"
+    ip: '>(\d+?\.\d+?.\d+?\.\d+?):\d+#'
+    port: '>\d+?\.\d+?.\d+?\.\d+?:(\d+)#'
+    proxy: true
+
+  - name: "proxy代理"
+    method: 'GET'
+    Headers:
+      User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+    urls: "https://free-proxy-list.net/,https://www.us-proxy.org/,https://www.socks-proxy.net/"
+    ip: '(\d+?\.\d+?.\d+?\.\d+?):\d+'
+    port: '\d+?\.\d+?.\d+?\.\d+?:(\d+)'
+    proxy: true
+
 
 #通过插件，扩展ip源
 spiderPlugin:
   #插件名
   - name: test
     #运行命令，返回的结果要符合格式
-    run: 'test.exe'
+    run: 'text.exe'
+
+#通过文件导入ip
+spiderFile:
+  #插件名
+  - name: test1
+    #运行命令，返回的结果要符合格式
+    path: 'ip.txt'
+
 
 
