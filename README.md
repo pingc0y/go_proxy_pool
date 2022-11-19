@@ -79,6 +79,7 @@ SET CGO_ENABLED=0
 SET GOOS=darwin
 SET GOARCH=arm64
 go build -ldflags "-s -w" -o ../goProxyPool-macos-arm64
+
 ```
 运行  
 需要与config.yml在同一目录  
@@ -171,7 +172,7 @@ config:
   #隧道代理更换时间秒
   tunnelTime: 60
   #可用IP数量小于‘proxyNum’时就去抓取
-  proxyNum: 150
+  proxyNum: 50
   #代理IP验证间隔秒
   verifyTime: 1800
   #抓取/检测状态线程数
@@ -205,6 +206,7 @@ spiderPlugin:
   - name: test
     #运行命令，返回的结果要符合格式
     run: '.\test1.exe'
+    
 #通过文件，导入IP
 spiderFile:
   #文件名

@@ -29,7 +29,7 @@ func countAdd(i int) {
 }
 func countDel() {
 	mux2.Lock()
-	fmt.Printf("\r代理验证中: %d", count)
+	fmt.Printf("\r代理验证中: %d     ", count)
 	count--
 	mux2.Unlock()
 
