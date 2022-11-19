@@ -35,7 +35,7 @@ func Run() {
 	r.GET("/verify", verify)
 
 	//抓取代理
-	r.GET("/upload", upload)
+	r.GET("/spider", spiderUp)
 
 	//更换隧道代理IP
 	r.GET("/tunnelUpdate", tunnelUpdate)
@@ -126,11 +126,11 @@ func verify(c *gin.Context) {
 	}
 }
 
-func upload(c *gin.Context) {
+func spiderUp(c *gin.Context) {
 	if run {
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"抓取中\"}"))
 	} else {
-		spiderRun()
+		go spiderRun()
 		c.String(200, fmt.Sprintf("{\"code\": 200, \"msg\": \"开始抓取代理IP\"}"))
 	}
 }

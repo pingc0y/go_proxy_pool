@@ -36,7 +36,7 @@ func spiderRun() {
 		go spider(&conf.Spider[i])
 	}
 	wg2.Wait()
-	log.Printf("\r%s 代理抓取结束    \n", time.Now().Format("2006-01-02 15:04:05"))
+	log.Printf("\r%s 代理抓取结束           \n", time.Now().Format("2006-01-02 15:04:05"))
 
 	count = 0
 	log.Println("开始扩展抓取代理...")
@@ -45,7 +45,7 @@ func spiderRun() {
 		go spiderPlugin(&conf.SpiderPlugin[i])
 	}
 	wg2.Wait()
-	log.Printf("\r%s 扩展代理抓取结束   \n", time.Now().Format("2006-01-02 15:04:05"))
+	log.Printf("\r%s 扩展代理抓取结束         \n", time.Now().Format("2006-01-02 15:04:05"))
 	count = 0
 	log.Println("开始文件抓取代理...")
 	for i := range conf.SpiderFile {
@@ -53,7 +53,7 @@ func spiderRun() {
 		go spiderFile(&conf.SpiderFile[i])
 	}
 	wg2.Wait()
-	log.Printf("\r%s 文件代理抓取结束   \n", time.Now().Format("2006-01-02 15:04:05"))
+	log.Printf("\r%s 文件代理抓取结束         \n", time.Now().Format("2006-01-02 15:04:05"))
 
 	//导出代理到文件
 	export()
