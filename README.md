@@ -106,7 +106,7 @@ http://127.0.0.1:8080/get?type=HTTP&count=10&anonymity=all
 可选参数：
 type        代理类型
 anonymity   匿名度
-region      地区
+country     国家
 source      代理源
 count       代理数量
 获取所有：all
@@ -137,19 +137,19 @@ http://127.0.0.1:8080/spider
 ## 代理字段解读
 ```go
 type ProxyIp struct {
-	Ip         string       //IP地址
-	Port       string       //代理端口
-	Info1      string       //代理地区信息1
-	Info2      string       //代理地区信息2
-	Info3      string       //代理地区信息3
-	Isp        string       //IP提供商
-	Type       string       //代理类型
-	Anonymity  string       //代理匿名度, 透明：显示真实IP, 普匿：显示假的IP, 高匿：无代理IP特征
-	Time       string       //最近一次代理验证时间 
-	Speed      string       //代理响应速度 
-	SuccessNum int          //验证请求成功的次数
-	RequestNum int          //验证请求的次数
-	Source     string       //代理源
+    Ip         string //IP地址
+    Port       string //代理端口
+    Country    string //代理国家
+    Province   string //代理省份
+    City       string //代理城市
+    Isp        string //IP提供商
+    Type       string //代理类型
+    Anonymity  string //代理匿名度, 透明：显示真实IP, 普匿：显示假的IP, 高匿：无代理IP特征
+    Time       string //代理验证
+    Speed      string //代理响应速度
+    SuccessNum int    //验证请求成功的次数
+    RequestNum int    //验证请求的次数
+    Source     string //代理源
 }
 ```
 ## 配置文件
@@ -241,6 +241,10 @@ spiderFile:
 
 
 ## 更新说明
+2022/11/22  
+修复 ip归属地接口更换  
+优化 验证代理   
+
 2022/11/19  
 新增 socket5代理  
 新增 文件导入代理  

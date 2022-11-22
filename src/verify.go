@@ -41,8 +41,8 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int, first bool) {
 		<-ch
 	}()
 	pr := pi.Ip + ":" + pi.Port
-	startT := time.Now()
 	//是抓取验证，还是验证代理池内IP
+	startT := time.Now()
 	if first {
 		if VerifyHttps(pr) {
 			pi.Type = "HTTPS"
@@ -51,17 +51,17 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int, first bool) {
 
 		} else if VerifySocket5(pr) {
 			pi.Type = "SOCKET5"
-			pi.Anonymity = "高匿"
 		} else {
 			return
 		}
 		tc := time.Since(startT)
 		pi.Time = time.Now().Format("2006-01-02 15:04:05")
 		pi.Speed = fmt.Sprintf("%s", tc)
-		if pi.Type != "SOCKET5" {
-			pi.Anonymity = Anonymity(pr, 0)
+		anonymity := Anonymity(pi, 0)
+		if anonymity == "" {
+			return
 		}
-
+		pi.Anonymity = anonymity
 	} else {
 		pi.RequestNum++
 		if pi.Type == "HTTPS" {
@@ -87,9 +87,9 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int, first bool) {
 	}
 	client := http.Client{Timeout: 15 * time.Second, Transport: &tr}
 	//处理返回结果
-	res, err := client.Get("https://api.vore.top/api/IPv4?v4=" + pi.Ip)
+	res, err := client.Get("https://searchplugin.csdn.net/api/v1/ip/get?ip=" + pi.Ip)
 	if err != nil {
-		res, err = client.Get("https://api.vore.top/api/IPv4?v4=" + pi.Ip)
+		res, err = client.Get("https://searchplugin.csdn.net/api/v1/ip/get?ip=" + pi.Ip)
 		if err != nil {
 			return
 		}
@@ -97,26 +97,29 @@ func Verify(pi *ProxyIp, wg *sync.WaitGroup, ch chan int, first bool) {
 	defer res.Body.Close()
 	dataBytes, _ := io.ReadAll(res.Body)
 	result := string(dataBytes)
-	info1 := regexp.MustCompile("info1\": \"(.*?)\"").FindAllStringSubmatch(result, -1)
-	if len(info1) != 0 {
-		pi.Info1 = info1[0][1]
-		info2 := regexp.MustCompile("info2\": \"(.*?)\"").FindAllStringSubmatch(result, -1)
-		if len(info2) != 0 {
-			pi.Info2 = info2[0][1]
-			info3 := regexp.MustCompile("info3\": \"(.*?)\"").FindAllStringSubmatch(result, -1)
-			if len(info3) != 0 {
-				pi.Info3 = info3[0][1]
+	address := regexp.MustCompile("\"address\":\"(.+?)\",").FindAllStringSubmatch(result, -1)
+	if len(address) != 0 {
+		addresss := removeDuplication_map(strings.Split(address[0][1], " "))
+		le := len(addresss)
+		pi.Isp = strings.Split(addresss[le-1], "/")[0]
+		for i := range addresss {
+			if i == le-1 {
+				break
+			}
+			switch i {
+			case 0:
+				pi.Country = addresss[0]
+			case 1:
+				pi.Province = addresss[1]
+			case 2:
+				pi.City = addresss[2]
 			}
 		}
 	}
-	isp := regexp.MustCompile("isp\": \"(.*?)\"").FindAllStringSubmatch(result, -1)
-	if len(isp) != 0 {
-		pi.Isp = isp[0][1]
-	}
+
 	pi.RequestNum = 1
 	pi.SuccessNum = 1
 	PIAdd(pi)
-
 }
 func VerifyHttp(pr string) bool {
 	proxyUrl, proxyErr := url.Parse("http://" + pr)
@@ -179,13 +182,19 @@ func VerifySocket5(pr string) bool {
 	return false
 
 }
-func Anonymity(pr string, c int) string {
+func Anonymity(pr *ProxyIp, c int) string {
 	c++
 	host := "http://httpbin.org/get"
-	proxyUrl, proxyErr := url.Parse("http://" + pr)
+	proxy := ""
+	if pr.Type == "SOCKET5" {
+		proxy = "socks5://" + pr.Ip + ":" + pr.Port
+	} else {
+		proxy = "http://" + pr.Ip + ":" + pr.Port
+	}
+	proxyUrl, proxyErr := url.Parse(proxy)
 	if proxyErr != nil {
 		if c >= 3 {
-			return "透明"
+			return ""
 		}
 		return Anonymity(pr, c)
 	}
@@ -200,7 +209,7 @@ func Anonymity(pr string, c int) string {
 	res, err := client.Do(request)
 	if err != nil {
 		if c >= 3 {
-			return "透明"
+			return ""
 		}
 		return Anonymity(pr, c)
 	}
@@ -209,7 +218,7 @@ func Anonymity(pr string, c int) string {
 	result := string(dataBytes)
 	if !strings.Contains(result, `"url": "http://httpbin.org/`) {
 		if c == 3 {
-			return "透明"
+			return ""
 		}
 		c++
 		return Anonymity(pr, c)
@@ -227,6 +236,11 @@ func Anonymity(pr string, c int) string {
 func PIAdd(pi *ProxyIp) {
 	lock.Lock()
 	defer lock.Unlock()
+	for i := range ProxyPool {
+		if ProxyPool[i].Ip == pi.Ip && ProxyPool[i].Port == pi.Port {
+			return
+		}
+	}
 	ProxyPool = append(ProxyPool, *pi)
 	ProxyPool = uniquePI(ProxyPool)
 }
@@ -266,4 +280,20 @@ func VerifyProxy() {
 	lock.Unlock()
 	log.Printf("\r%s 代理验证结束, 当前可用IP数: %d\n", time.Now().Format("2006-01-02 15:04:05"), len(ProxyPool))
 	verifyIS = false
+}
+
+func removeDuplication_map(arr []string) []string {
+	set := make(map[string]struct{}, len(arr))
+	j := 0
+	for _, v := range arr {
+		_, ok := set[v]
+		if ok {
+			continue
+		}
+		set[v] = struct{}{}
+		arr[j] = v
+		j++
+	}
+
+	return arr[:j]
 }

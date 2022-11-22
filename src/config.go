@@ -55,9 +55,9 @@ type Proxy struct {
 type ProxyIp struct {
 	Ip         string //IP地址
 	Port       string //代理端口
-	Info1      string //代理地区信息1
-	Info2      string //代理地区信息2
-	Info3      string //代理地区信息3
+	Country    string //代理国家
+	Province   string //代理省份
+	City       string //代理城市
 	Isp        string //IP提供商
 	Type       string //代理类型
 	Anonymity  string //代理匿名度, 透明：显示真实IP, 普匿：显示假的IP, 高匿：无代理IP特征

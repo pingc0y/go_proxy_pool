@@ -13,7 +13,7 @@ type Home struct {
 	Sum         int               `yaml:"sum" json:"sum"`
 	Type        map[string]int    `yaml:"type" json:"type"`
 	Anonymity   map[string]int    `yaml:"anonymity" json:"anonymity"`
-	Region      map[string]int    `yaml:"region" json:"region"`
+	Country     map[string]int    `yaml:"country" json:"country"`
 	Source      map[string]int    `yaml:"source" json:"source"`
 }
 
@@ -45,11 +45,11 @@ func Run() {
 
 }
 func index(c *gin.Context) {
-	home := Home{Sum: len(ProxyPool), Type: make(map[string]int), Anonymity: make(map[string]int), Region: make(map[string]int), Source: make(map[string]int), TunnelProxy: make(map[string]string)}
+	home := Home{Sum: len(ProxyPool), Type: make(map[string]int), Anonymity: make(map[string]int), Country: make(map[string]int), Source: make(map[string]int), TunnelProxy: make(map[string]string)}
 	for i := range ProxyPool {
 		home.Type[ProxyPool[i].Type] += 1
 		home.Anonymity[ProxyPool[i].Anonymity] += 1
-		home.Region[ProxyPool[i].Info1] += 1
+		home.Country[ProxyPool[i].Country] += 1
 		home.Source[ProxyPool[i].Source] += 1
 	}
 	home.TunnelProxy["HTTP"] = httpIp
@@ -68,11 +68,11 @@ func get(c *gin.Context) {
 	var jsonByte []byte
 	ty := c.DefaultQuery("type", "all")
 	an := c.DefaultQuery("anonymity", "all")
-	re := c.DefaultQuery("region", "all")
+	re := c.DefaultQuery("country", "all")
 	so := c.DefaultQuery("source", "all")
 	co := c.DefaultQuery("count", "1")
 	for _, v := range ProxyPool {
-		if (v.Type == ty || ty == "all") && (v.Anonymity == an || an == "all") && (v.Info1 == re || re == "all") && (v.Source == so || so == "all") {
+		if (v.Type == ty || ty == "all") && (v.Anonymity == an || an == "all") && (v.Country == re || re == "all") && (v.Source == so || so == "all") {
 			prs = append(prs, v)
 		}
 	}
