@@ -40,7 +40,7 @@ header.server="nginx/2.2.200603d"&&web.title="502 Bad Gateway" && ip.port="8085"
 # 使用说明
 下载 
 ```
-git clone git@github.com:pingc0y/goProxyPool.git
+git clone https://github.com/pingc0y/go_proxy_pool.git
 ```
 编译（直接使用成品，就无需编译）  
 以下是在windows环境下，编译出各平台可执行文件的命令  
