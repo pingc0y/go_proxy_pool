@@ -16,7 +16,7 @@ config:
   #隧道代理更换时间秒
   tunnelTime: 60
   #可用IP数量小于‘proxyNum’时就去抓取
-  proxyNum: 10
+  proxyNum: 30
   #代理IP验证间隔秒
   verifyTime: 1800
   #抓取/检测状态线程数
@@ -159,18 +159,18 @@ spider:
 
 
 #通过插件，扩展ip源
-spiderPlugin:
-  #插件名
-  - name: test
-    #运行命令，返回的结果要符合格式
-    run: 'text.exe'
+#spiderPlugin:
+#  #插件名
+#  - name: test
+#    #运行命令，返回的结果要符合格式
+#    run: 'text.exe'
 
 #通过文件导入ip
-spiderFile:
-  #插件名
-  - name: test1
-    #运行命令，返回的结果要符合格式
-    path: 'ip.txt'
-
-
+#spiderFile:
+#  #插件名
+#  - name: test1
+#    #运行命令，返回的结果要符合格式
+#    path: 'ip.txt'
+#
+#
 
